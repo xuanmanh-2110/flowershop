@@ -492,7 +492,7 @@ erDiagram
     }
 ```
 
-### Quy trình hệ thống (Sequence Diagrams)
+#### Quy trình hệ thống (Sequence Diagrams)
 
 ### Sequence Diagram Quản lý Xác thực
 
