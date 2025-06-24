@@ -304,6 +304,7 @@ php artisan test
 - **Responsive Design**: Giao diện tương thích đa thiết bị
 - **Admin Analytics**: Thống kê sản phẩm, đơn hàng và khách hàng
 
+
 ## 🤝 Đóng góp
 
 1. Fork dự án
@@ -342,6 +343,7 @@ php artisan view:clear
 - `order_items` - Chi tiết đơn hàng
 - `reviews` - Đánh giá và nhận xét sản phẩm
 
+
 ### Phương thức thanh toán hỗ trợ
 - **COD**: Thanh toán khi nhận hàng
 - **Bank Transfer**: Chuyển khoản ngân hàng
@@ -354,4 +356,218 @@ php artisan view:clear
 - **Data Validation**: Comprehensive input validation
 - **CSRF Protection**: Laravel built-in CSRF protection
 
+### Sơ đồ Database (ERD)
+
+```mermaid
+erDiagram
+    USERS ||--o{ ORDERS : "đặt hàng"
+    USERS ||--o{ REVIEWS : "viết đánh giá"
+    USERS ||--o{ PAYMENTS : "thanh toán"
+    USERS {
+        bigint id PK
+        string name
+        string email
+        string password
+        string address
+        string phone
+        string role "admin/customer"
+        timestamp email_verified_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    PRODUCTS ||--o{ ORDER_ITEMS : "được đặt mua"
+    PRODUCTS ||--o{ REVIEWS : "được đánh giá"
+    PRODUCTS ||--o{ PRODUCT_CATEGORIES : "thuộc danh mục"
+    PRODUCTS {
+        bigint id PK
+        string name
+        text description
+        decimal price
+        integer stock
+        string image
+        integer views "lượt xem"
+        integer sales "lượt bán"
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    CATEGORIES ||--o{ PRODUCT_CATEGORIES : "phân loại"
+    CATEGORIES {
+        bigint id PK
+        string name
+        string slug
+        text description
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    PRODUCT_CATEGORIES {
+        bigint id PK
+        bigint product_id FK
+        bigint category_id FK
+    }
+    
+    ORDERS ||--|{ ORDER_ITEMS : "chứa"
+    ORDERS ||--|| PAYMENTS : "có thanh toán"
+    ORDERS ||--|| SHIPPING : "vận chuyển"
+    ORDERS {
+        bigint id PK
+        bigint user_id FK
+        string order_code
+        decimal total
+        string status "pending/processing/completed/cancelled"
+        string payment_method
+        string shipping_address
+        string notes
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    ORDER_ITEMS {
+        bigint id PK
+        bigint order_id FK
+        bigint product_id FK
+        integer quantity
+        decimal price
+        decimal discount
+    }
+    
+    PAYMENTS {
+        bigint id PK
+        bigint order_id FK
+        bigint user_id FK
+        decimal amount
+        string method "cod/bank/credit"
+        string status
+        string transaction_code
+        timestamp paid_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    SHIPPING {
+        bigint id PK
+        bigint order_id FK
+        string shipping_code
+        string carrier
+        string status
+        timestamp shipped_at
+        timestamp delivered_at
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    REVIEWS {
+        bigint id PK
+        bigint user_id FK
+        bigint product_id FK
+        integer rating
+        text comment
+        string images "JSON array"
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    DISCOUNTS ||--o{ PRODUCTS : "áp dụng"
+    DISCOUNTS {
+        bigint id PK
+        string code
+        string type "percentage/fixed"
+        decimal value
+        date start_date
+        date end_date
+        integer usage_limit
+        timestamp created_at
+        timestamp updated_at
+    }
+    
+    CART_ITEMS {
+        bigint id PK
+        bigint user_id FK
+        bigint product_id FK
+        integer quantity
+        timestamp created_at
+        timestamp updated_at
+    }
+```
+
+
+## Quy trình hệ thống (Sequence Diagrams)
+
+### 1. Quản lý sản phẩm
+```mermaid
+sequenceDiagram
+    participant Admin
+    participant Controller
+    participant Model
+    participant View
+    
+    Admin->>Controller: Thêm sản phẩm mới
+    Controller->>Model: Lưu thông tin sản phẩm
+    Model-->>Controller: Xác nhận lưu thành công
+    Controller->>View: Hiển thị thông báo
+    View-->>Admin: Thông báo thành công
+```
+
+### 2. Quy trình đăng nhập
+```mermaid
+sequenceDiagram
+    participant User
+    participant AuthController
+    participant UserModel
+    participant Session
+    
+    User->>AuthController: Submit form đăng nhập
+    AuthController->>UserModel: Kiểm tra thông tin
+    UserModel-->>AuthController: Kết quả xác thực
+    AuthController->>Session: Tạo session
+    AuthController->>User: Chuyển hướng trang chủ
+```
+
+### 3. Quy trình thanh toán
+```mermaid
+sequenceDiagram
+    participant Customer
+    participant CartController
+    participant OrderController
+    participant PaymentService
+    
+    Customer->>CartController: Xác nhận thanh toán
+    CartController->>OrderController: Tạo đơn hàng
+    OrderController->>PaymentService: Xử lý thanh toán
+    PaymentService-->>OrderController: Kết quả thanh toán
+    OrderController-->>Customer: Hiển thị kết quả
+```
+
+### 4. Quy trình đánh giá sản phẩm
+```mermaid
+sequenceDiagram
+    participant Customer
+    participant ProductController
+    participant ReviewModel
+    participant ProductModel
+    
+    Customer->>ProductController: Gửi đánh giá
+    ProductController->>ReviewModel: Lưu đánh giá
+    ReviewModel->>ProductModel: Cập nhật rating trung bình
+    ProductModel-->>ProductController: Xác nhận
+    ProductController-->>Customer: Thông báo thành công
+```
+
+### 5. Quy trình quản lý đơn hàng
+```mermaid
+sequenceDiagram
+    participant Admin
+    participant OrderController
+    participant OrderModel
+    participant EmailService
+    
+    Admin->>OrderController: Cập nhật trạng thái đơn hàng
+    OrderController->>OrderModel: Lưu trạng thái mới
+    OrderModel->>EmailService: Gửi email thông báo
+    EmailService-->>OrderModel: Xác nhận gửi email
+    OrderModel-->>OrderController: Hoàn tất cập nhật
+    OrderController-->>Admin: Thông báo thành công
+```
 ---
