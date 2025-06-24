@@ -492,82 +492,475 @@ erDiagram
     }
 ```
 
+### Quy trình hệ thống (Sequence Diagrams)
 
-## Quy trình hệ thống (Sequence Diagrams)
+### Sequence Diagram Quản lý Xác thực
 
-### 1. Quản lý sản phẩm
+## 1. Đăng ký tài khoản
 ```mermaid
 sequenceDiagram
-    participant Admin
-    participant Controller
-    participant Model
-    participant View
-    
-    Admin->>Controller: Thêm sản phẩm mới
-    Controller->>Model: Lưu thông tin sản phẩm
-    Model-->>Controller: Xác nhận lưu thành công
-    Controller->>View: Hiển thị thông báo
-    View-->>Admin: Thông báo thành công
-```
-
-### 2. Quy trình đăng nhập
-```mermaid
-sequenceDiagram
-    participant User
+    actor User
+    participant View (register.blade.php)
     participant AuthController
-    participant UserModel
+    participant User Model
+    participant Auth
+
+    User->>View: Truy cập form đăng ký
+    View-->>User: Hiển thị form
+    User->>View: Nhập thông tin (name, email, password)
+    View->>AuthController: POST /register
+    AuthController->>AuthController: Validate data
+    alt Validation fail
+        AuthController-->>View: Hiển thị lỗi
+    else Validation pass
+        AuthController->>User Model: create()
+        User Model-->>AuthController: User created
+        AuthController->>Auth: attempt(email, password)
+        Auth-->>AuthController: Login success
+        AuthController-->>User: Redirect to home
+    end
+```
+
+## 2. Đăng nhập
+```mermaid
+sequenceDiagram
+    actor User
+    participant View (login.blade.php)
+    participant AuthController
+    participant Auth
+
+    User->>View: Truy cập form đăng nhập
+    View-->>User: Hiển thị form
+    User->>View: Nhập thông tin (email/name, password)
+    View->>AuthController: POST /login
+    AuthController->>AuthController: Validate data
+    AuthController->>Auth: attempt(credentials)
+    alt Authentication success
+        Auth-->>AuthController: Login success
+        AuthController-->>User: Redirect to home
+    else Authentication fail
+        Auth-->>AuthController: Login failed
+        AuthController-->>View: Hiển thị lỗi
+    end
+```
+
+## 3. Đăng xuất
+```mermaid
+sequenceDiagram
+    actor User
+    participant View
+    participant AuthController
+    participant Auth
     participant Session
-    
-    User->>AuthController: Submit form đăng nhập
-    AuthController->>UserModel: Kiểm tra thông tin
-    UserModel-->>AuthController: Kết quả xác thực
-    AuthController->>Session: Tạo session
-    AuthController->>User: Chuyển hướng trang chủ
+
+    User->>View: Click nút đăng xuất
+    View->>AuthController: POST /logout
+    AuthController->>Auth: logout()
+    AuthController->>Session: invalidate()
+    AuthController->>Session: regenerateToken()
+    AuthController-->>User: Redirect to home
 ```
 
-### 3. Quy trình thanh toán
-```mermaid
-sequenceDiagram
-    participant Customer
-    participant CartController
-    participant OrderController
-    participant PaymentService
-    
-    Customer->>CartController: Xác nhận thanh toán
-    CartController->>OrderController: Tạo đơn hàng
-    OrderController->>PaymentService: Xử lý thanh toán
-    PaymentService-->>OrderController: Kết quả thanh toán
-    OrderController-->>Customer: Hiển thị kết quả
-```
+### Sequence Diagram Quản lý Sản phẩm
 
-### 4. Quy trình đánh giá sản phẩm
+## 1. Thêm sản phẩm mới
 ```mermaid
 sequenceDiagram
-    participant Customer
+    actor User
+    participant View (create.blade.php)
     participant ProductController
-    participant ReviewModel
-    participant ProductModel
-    
-    Customer->>ProductController: Gửi đánh giá
-    ProductController->>ReviewModel: Lưu đánh giá
-    ReviewModel->>ProductModel: Cập nhật rating trung bình
-    ProductModel-->>ProductController: Xác nhận
-    ProductController-->>Customer: Thông báo thành công
+    participant Product Model
+    participant Storage
+
+    User->>View: Truy cập form thêm sản phẩm
+    View-->>User: Hiển thị form
+    User->>View: Nhập thông tin + ảnh
+    View->>ProductController: POST /products (store)
+    ProductController->>ProductController: Validate data
+    alt Validation fail
+        ProductController-->>View: Hiển thị lỗi
+    else Validation pass
+        ProductController->>Storage: Lưu ảnh
+        Storage-->>ProductController: Trả về path ảnh
+        ProductController->>Product Model: create()
+        Product Model-->>ProductController: Product created
+        ProductController-->>User: Redirect to list with success
+    end
 ```
 
-### 5. Quy trình quản lý đơn hàng
+## 2. Cập nhật sản phẩm
 ```mermaid
 sequenceDiagram
-    participant Admin
+    actor User
+    participant View (edit.blade.php)
+    participant ProductController
+    participant Product Model
+    participant Storage
+
+    User->>View: Truy cập form sửa sản phẩm
+    View-->>User: Hiển thị form với data hiện tại
+    User->>View: Cập nhật thông tin + ảnh (nếu có)
+    View->>ProductController: PUT /products/{product} (update)
+    ProductController->>ProductController: Validate data
+    alt Validation fail
+        ProductController-->>View: Hiển thị lỗi
+    else Validation pass
+        alt Có upload ảnh mới
+            ProductController->>Storage: Xóa ảnh cũ
+            ProductController->>Storage: Lưu ảnh mới
+            Storage-->>ProductController: Trả về path ảnh mới
+        end
+        ProductController->>Product Model: update()
+        Product Model-->>ProductController: Product updated
+        ProductController-->>User: Redirect to list with success
+    end
+```
+
+## 3. Xóa sản phẩm
+```mermaid
+sequenceDiagram
+    actor User
+    participant View (index.blade.php)
+    participant ProductController
+    participant Product Model
+    participant Storage
+
+    User->>View: Click nút xóa
+    View->>ProductController: DELETE /products/{product} (destroy)
+    ProductController->>Storage: Xóa ảnh (nếu có)
+    ProductController->>Product Model: delete()
+    Product Model-->>ProductController: Product deleted
+    ProductController-->>User: Redirect to list with success
+```
+
+## 4. Xem chi tiết sản phẩm
+```mermaid
+sequenceDiagram
+    actor User
+    participant View (show.blade.php)
+    participant ProductController
+    participant Product Model
+    participant Review Model
+
+    User->>View: Truy cập trang chi tiết
+    View->>ProductController: GET /products/{product} (show)
+    ProductController->>Product Model: Find product
+    ProductController->>Review Model: Get reviews
+    ProductController->>Product Model: Get related products
+    Product Model-->>ProductController: Product data
+    Review Model-->>ProductController: Reviews data
+    ProductController-->>View: Render view with data
+    View-->>User: Hiển thị chi tiết sản phẩm
+```
+
+# Sequence Diagram Quản lý Khách hàng
+
+## 1. Tạo mới khách hàng
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant View (customers/create.blade.php)
+    participant CustomerController
+    participant Customer Model
+
+    Admin->>View: Truy cập form tạo khách hàng
+    View-->>Admin: Hiển thị form
+    Admin->>View: Nhập thông tin (name, email, phone)
+    View->>CustomerController: POST /customers
+    CustomerController->>CustomerController: Validate data
+    CustomerController->>Customer Model: create()
+    Customer Model-->>CustomerController: Customer created
+    CustomerController-->>Admin: Redirect với thông báo
+```
+
+## 2. Cập nhật thông tin khách hàng
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant View (customers/edit.blade.php)
+    participant CustomerController
+    participant Customer Model
+
+    Admin->>View: Truy cập form sửa khách hàng
+    View-->>Admin: Hiển thị form với data hiện tại
+    Admin->>View: Cập nhật thông tin
+    View->>CustomerController: PUT /customers/{customer}
+    CustomerController->>Customer Model: findOrFail(customer)
+    CustomerController->>CustomerController: Validate data
+    CustomerController->>Customer Model: update()
+    Customer Model-->>CustomerController: Customer updated
+    CustomerController-->>Admin: Redirect với thông báo
+```
+
+## 3. Xem danh sách khách hàng
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant View (customers/index.blade.php)
+    participant CustomerController
+    participant Customer Model
+
+    Admin->>View: Truy cập trang danh sách
+    View->>CustomerController: GET /customers
+    CustomerController->>Customer Model: with('user')->paginate()
+    Customer Model-->>CustomerController: Danh sách khách hàng
+    CustomerController-->>View: Trả về dữ liệu
+    View-->>Admin: Hiển thị danh sách
+```
+
+## 4. Xem lịch sử đơn hàng của khách hàng
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant View (customers/orders.blade.php)
+    participant CustomerController
+    participant Customer Model
+    participant Order Model
+
+    Admin->>View: Click "Xem đơn hàng"
+    View->>CustomerController: GET /customers/{customer}/orders
+    CustomerController->>Customer Model: findOrFail(customer)
+    CustomerController->>Order Model: get orders with items
+    Order Model-->>CustomerController: Danh sách đơn hàng
+    CustomerController-->>View: Trả về dữ liệu
+    View-->>Admin: Hiển thị lịch sử đơn hàng
+```
+
+### Sequence Diagram Quy trình Đặt hàng
+
+## 1. Thêm sản phẩm vào giỏ hàng
+```mermaid
+sequenceDiagram
+    actor User
+    participant View (shop.blade.php)
+    participant CartController
+    participant Product Model
+    participant Session
+
+    User->>View: Click "Thêm vào giỏ"
+    View->>CartController: POST /cart/add/{id}
+    CartController->>Product Model: findOrFail(id)
+    CartController->>Session: get('cart')
+    alt Sản phẩm đã có trong giỏ
+        CartController->>CartController: Cập nhật số lượng
+    else Sản phẩm mới
+        CartController->>CartController: Thêm sản phẩm mới
+    end
+    CartController->>Session: put('cart', updatedCart)
+    CartController-->>User: Redirect/JSON response
+```
+
+## 2. Thanh toán
+```mermaid
+sequenceDiagram
+    actor User
+    participant View (cart/index.blade.php)
+    participant CheckoutController
+    participant Session
+    participant User Model
+    participant Order Model
+
+    User->>View: Click "Thanh toán"
+    View->>CheckoutController: GET /checkout
+    CheckoutController->>Session: get('cart')
+    CheckoutController->>User Model: get current user
+    CheckoutController->>Order Model: get last order (nếu có)
+    CheckoutController-->>View: Trả về trang thanh toán
+    User->>View: Nhập thông tin giao hàng
+    View->>CheckoutController: POST /checkout
+    CheckoutController->>CheckoutController: Validate data
+    CheckoutController->>Order Model: create new order
+    CheckoutController->>Session: forget('cart')
+    CheckoutController-->>User: Redirect đến trang đơn hàng
+```
+
+## 3. Xử lý đơn hàng
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant View (orders/index.blade.php)
     participant OrderController
-    participant OrderModel
-    participant EmailService
-    
-    Admin->>OrderController: Cập nhật trạng thái đơn hàng
-    OrderController->>OrderModel: Lưu trạng thái mới
-    OrderModel->>EmailService: Gửi email thông báo
-    EmailService-->>OrderModel: Xác nhận gửi email
-    OrderModel-->>OrderController: Hoàn tất cập nhật
-    OrderController-->>Admin: Thông báo thành công
+    participant Order Model
+
+    Admin->>View: Truy cập trang quản lý đơn hàng
+    View->>OrderController: GET /orders
+    OrderController->>Order Model: with('customer', 'items.product')
+    OrderController-->>View: Trả về danh sách đơn hàng
+    Admin->>View: Click "Cập nhật trạng thái"
+    View->>OrderController: POST /orders/{id}/update-status
+    OrderController->>Order Model: findOrFail(id)
+    OrderController->>Order Model: update status
+    OrderController-->>Admin: Redirect với thông báo
+```
+
+### Sequence Diagram Quy trình Thanh toán Chi tiết
+
+```mermaid
+sequenceDiagram
+    actor User
+    participant View (checkout.blade.php)
+    participant CheckoutController
+    participant Session
+    participant User Model
+    participant Customer Model
+    participant Order Model
+    participant OrderItem Model
+    participant Product Model
+
+    User->>View: Truy cập trang thanh toán
+    View->>CheckoutController: GET /checkout
+    CheckoutController->>Session: get('cart')
+    CheckoutController->>User Model: get current user
+    CheckoutController->>Customer Model: findOrCreate by email
+    CheckoutController->>Order Model: get last order (nếu có)
+    CheckoutController-->>View: Trả về trang thanh toán với dữ liệu
+
+    User->>View: Nhập thông tin (địa chỉ, phone, payment)
+    View->>CheckoutController: POST /checkout
+    CheckoutController->>CheckoutController: Validate data
+    CheckoutController->>Order Model: create new order
+    loop Cho từng sản phẩm trong giỏ
+        CheckoutController->>Product Model: findOrFail(product_id)
+        CheckoutController->>OrderItem Model: create order item
+    end
+    CheckoutController->>Order Model: update total_amount
+    CheckoutController->>Session: forget('cart')
+    CheckoutController-->>User: Redirect đến trang chi tiết đơn hàng
+```
+
+### Sequence Diagram Quy trình Đánh giá Sản phẩm
+
+## 1. Thêm đánh giá
+```mermaid
+sequenceDiagram
+    actor User
+    participant View (products/show.blade.php)
+    participant ProductController
+    participant Review Model
+    participant Product Model
+
+    User->>View: Nhập đánh giá (rating, content)
+    View->>ProductController: POST /products/{product}/reviews
+    ProductController->>ProductController: Validate data
+    ProductController->>Review Model: create new review
+    Review Model->>Product Model: attach to product
+    ProductController-->>User: JSON response/redirect
+```
+
+## 2. Cập nhật đánh giá
+```mermaid
+sequenceDiagram
+    actor User
+    participant View
+    participant ProductController
+    participant Review Model
+
+    User->>View: Click "Sửa đánh giá"
+    View->>ProductController: PUT /reviews/{review}
+    ProductController->>Review Model: findOrFail(review)
+    ProductController->>ProductController: Check permission
+    ProductController->>Review Model: update review
+    ProductController-->>User: JSON response
+```
+
+## 3. Xóa đánh giá
+```mermaid
+sequenceDiagram
+    actor User
+    participant View
+    participant ProductController
+    participant Review Model
+
+    User->>View: Click "Xóa đánh giá"
+    View->>ProductController: DELETE /reviews/{review}
+    ProductController->>Review Model: findOrFail(review)
+    ProductController->>ProductController: Check permission
+    ProductController->>Review Model: delete review
+    ProductController-->>User: JSON response
+```
+
+## 4. Hiển thị đánh giá
+```mermaid
+sequenceDiagram
+    actor User
+    participant View (products/show.blade.php)
+    participant ProductController
+    participant Product Model
+    participant Review Model
+
+    User->>View: Truy cập trang chi tiết sản phẩm
+    View->>ProductController: GET /products/{product}
+    ProductController->>Product Model: findOrFail(product)
+    ProductController->>Review Model: get reviews for product
+    ProductController-->>View: Trả về dữ liệu
+    View-->>User: Hiển thị danh sách đánh giá
+```
+
+### Sequence Diagram Quy trình Thống kê Báo cáo
+
+## 1. Thống kê sản phẩm
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant View (products/analytics.blade.php)
+    participant ProductController
+    participant Product Model
+    participant OrderItem Model
+
+    Admin->>View: Truy cập trang thống kê
+    View->>ProductController: GET /products/{product}/analytics
+    ProductController->>Product Model: findOrFail(product)
+    ProductController->>OrderItem Model: get sales data
+    ProductController->>Product Model: get reviews data
+    ProductController-->>View: Trả về dữ liệu thống kê
+    View-->>Admin: Hiển thị biểu đồ và số liệu
+```
+
+## 2. Thống kê đơn hàng
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant View (orders/index.blade.php)
+    participant OrderController
+    participant Order Model
+
+    Admin->>View: Truy cập trang đơn hàng
+    View->>OrderController: GET /orders
+    OrderController->>Order Model: filter by date/status
+    OrderController->>Order Model: calculate totals
+    OrderController-->>View: Trả về dữ liệu
+    View-->>Admin: Hiển thị báo cáo
+```
+
+## 3. Thống kê doanh thu
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant View
+    participant OrderController
+    participant Order Model
+
+    Admin->>View: Chọn khoảng thời gian
+    View->>OrderController: GET /orders?from=...&to=...
+    OrderController->>Order Model: sum total_amount
+    OrderController->>Order Model: group by period
+    OrderController-->>View: Trả về doanh thu
+    View-->>Admin: Hiển thị biểu đồ
+```
+
+## 4. Thống kê đánh giá
+```mermaid
+sequenceDiagram
+    actor Admin
+    participant View
+    participant ProductController
+    participant Review Model
+
+    Admin->>View: Truy cập trang đánh giá
+    View->>ProductController: GET /products/{product}/analytics
+    ProductController->>Review Model: get rating distribution
+    ProductController->>Review Model: calculate average
+    ProductController-->>View: Trả về dữ liệu
+    View-->>Admin: Hiển thị phân bố đánh giá
 ```
 ---
