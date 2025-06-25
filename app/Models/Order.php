@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $fillable = ['id', 'customer_id', 'total_amount', 'status', 'address', 'phone', 'payment_method', 'customer_bank_name', 'customer_account_number'];
+    protected $fillable = ['id', 'customer_id', 'total_amount', 'status', 'payment_method', 'customer_bank_name', 'customer_account_number'];
     
     // Tắt auto increment để tự quản lý ID
     public $incrementing = false;

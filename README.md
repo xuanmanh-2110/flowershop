@@ -22,15 +22,40 @@ Dự án "FlowerShop" là một ứng dụng web thương mại điện tử chu
 
 - [Mô tả dự án](#-mô-tả-dự-án)
 - [Tính năng chính](#-tính-năng-chính)
+  - [Dành cho Khách hàng](#-dành-cho-khách-hàng)
+  - [Dành cho Quản trị viên](#-dành-cho-quản-trị-viên)
 - [Công nghệ sử dụng](#-công-nghệ-sử-dụng)
+  - [Backend](#backend)
+  - [Frontend](#frontend)
+  - [Database](#database)
+  - [Development Tools](#development-tools)
 - [Yêu cầu hệ thống](#-yêu-cầu-hệ-thống)
 - [Hướng dẫn cài đặt](#-hướng-dẫn-cài-đặt)
+  - [Clone dự án](#1-clone-dự-án)
+  - [Cài đặt dependencies PHP](#2-cài-đặt-dependencies-php)
+  - [Cài đặt dependencies JavaScript](#3-cài-đặt-dependencies-javascript)
+  - [Cấu hình môi trường](#4-cấu-hình-môi-trường)
+  - [Cấu hình database trong file .env](#5-cấu-hình-database-trong-file-env)
+  - [Chạy migration và seeder](#6-chạy-migration-và-seeder)
+  - [Khởi chạy ứng dụng](#7-khởi-chạy-ứng-dụng)
+    - [Phương pháp 1: Chạy riêng lẻ](#phương-pháp-1-chạy-riêng-lẻ)
+    - [Phương pháp 2: Chạy đồng thời (Khuyến nghị)](#phương-pháp-2-chạy-đồng-thời-khuyến-nghị)
 - [Cấu trúc dự án](#-cấu-trúc-dự-án)
 - [Sử dụng](#-sử-dụng)
+  - [Đăng nhập Admin](#đăng-nhập-admin)
+  - [Quản lý sản phẩm](#quản-lý-sản-phẩm)
+  - [Mua sắm](#mua-sắm)
 - [API Endpoints chính](#-api-endpoints-chính)
+  - [Authentication](#authentication)
+  - [Products](#products)
+  - [Cart & Checkout](#cart--checkout)
+  - [Orders](#orders)
+  - [Reviews](#reviews)
+  - [Profile](#profile)
 - [Testing](#-testing)
 - [Tính năng nâng cao](#-tính-năng-nâng-cao)
 - [Đóng góp](#-đóng-góp)
+- [Yêu cầu đã hoàn thành](#-yêu-cầu-đã-hoàn-thành)
 - [Ghi chú phát triển](#-ghi-chú-phát-triển)
 
 
@@ -312,6 +337,112 @@ php artisan test
 3. Commit thay đổi (`git commit -m 'Add some amazing feature'`)
 4. Push to branch (`git push origin feature/amazing-feature`)
 5. Tạo Pull Request
+
+## ✅ Yêu cầu đã hoàn thành
+
+1. **Sử dụng Laravel Framework**
+   - Đã triển khai Laravel 12.x với đầy đủ cấu trúc MVC
+   - Minh chứng: File `composer.json`, `routes/web.php`
+
+2. **Các đối tượng trong hệ thống**
+   - User (Người dùng)
+   - Customer (Khách hàng)
+   - Product (Sản phẩm)
+   - Order (Đơn hàng)
+   - OrderItem (Chi tiết đơn hàng)
+   - Review (Đánh giá sản phẩm)
+
+3. **Chức năng định danh và xác thực (User)**
+   - Sử dụng Laravel Breeze cho authentication
+   - Đăng ký tài khoản (Register)
+   - Đăng nhập hệ thống (Login)
+   - Đăng xuất (Logout)
+   - Quên mật khẩu và reset password
+   - Quản lý profile người dùng
+
+   ```php
+   // routes/web.php
+   Route::get('/register', [AuthController::class, 'showRegister']);
+   Route::post('/register', [AuthController::class, 'register']);
+   
+   Route::get('/login', [AuthController::class, 'showLogin']);
+   Route::post('/login', [AuthController::class, 'login']);
+   
+   Route::post('/logout', [AuthController::class, 'logout']);
+   ```
+
+   - Minh chứng:
+     + File routes: `routes/auth.php`
+     + Views: `resources/views/auth`
+     + Controller: `app/Http/Controllers/AuthController.php`
+
+4. **Quản lý Order**
+   - Order CRUD: Tạo, đọc, cập nhật, xóa đơn hàng
+   - Order Item Management: Quản lý các sản phẩm trong đơn hàng
+   - Order Status Tracking: Theo dõi trạng thái đơn hàng
+   - Payment Processing: Xử lý thanh toán đơn hàng
+
+   ```php
+   // OrderController
+   public function store(Request $request) {
+       $validated = $request->validate([
+           'customer_id' => 'required|exists:customers,id',
+           'products' => 'required|array'
+       ]);
+       // Xử lý tạo đơn hàng
+   }
+
+   // Cập nhật trạng thái đơn hàng
+   public function updateStatus(Request $request, $id) {
+       $order = Order::findOrFail($id);
+       $order->update(['status' => $request->status]);
+   }
+   ```
+
+5. **Security**
+   - CSRF Protection:
+     ```php
+     // Trong form blade
+     <form method="POST">
+       @csrf
+       <!-- Các trường form -->
+     </form>
+     ```
+
+   - Input Validation:
+     ```php
+     // Trong controller
+     $validated = $request->validate([
+         'email' => 'required|email|max:255',
+         'password' => 'required|min:8'
+     ]);
+     ```
+
+   - Authentication Middleware:
+     ```php
+     // Trong routes/web.php
+     Route::middleware('auth')->group(function() {
+         Route::get('/dashboard', [DashboardController::class, 'index']);
+     });
+     ```
+
+   - Authorization Check:
+     ```php
+     // Trong controller
+     if (!auth()->user()->is_admin) {
+         abort(403, 'Unauthorized action');
+     }
+     ```
+
+6. **Eloquent với Cloud Database**
+   - Kết nối MySQL trên Aiven Cloud
+   ```env
+   DB_HOST=mysql-manh-laravelapp.h.aivencloud.com
+   DB_PORT=25185
+   ```
+
+7. **Public Link**
+   - Ứng dụng có thể truy cập tại:
 
 ## 📝 Ghi chú phát triển
 

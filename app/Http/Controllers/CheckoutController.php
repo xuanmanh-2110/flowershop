@@ -55,9 +55,11 @@ class CheckoutController extends Controller
         $lastOrder = null;
         if ($customer && (!$userAddress || !$userPhone)) {
             $lastOrder = Order::where('customer_id', $customer->id)
-                            ->whereNotNull('address')
-                            ->whereNotNull('phone')
-                            ->orderBy('created_at', 'desc')
+                            ->join('customers', 'orders.customer_id', '=', 'customers.id')
+                            ->whereNotNull('customers.address')
+                            ->whereNotNull('customers.phone')
+                            ->orderBy('orders.created_at', 'desc')
+                            ->select('orders.*')
                             ->first();
         }
         
@@ -102,13 +104,14 @@ class CheckoutController extends Controller
         );
         
         // Cập nhật thông tin số điện thoại mới nhất
-        $customer->update(['phone' => $request->phone]);
+        $customer->update([
+            'phone' => $request->phone,
+            'address' => $request->address,
+        ]);
 
         $orderData = [
             'customer_id' => $customer->id,
             'total_amount' => 0,
-            'address' => $request->address,
-            'phone' => $request->phone,
             'payment_method' => $request->payment_method,
         ];
 

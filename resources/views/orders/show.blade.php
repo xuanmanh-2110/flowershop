@@ -6,8 +6,8 @@
     <div class="bg-white p-6 rounded-lg shadow-sm">
         <p class="mb-2"><strong class="font-semibold text-gray-800">Khách hàng:</strong> {{ $order->customer->name ?? 'N/A' }}</p>
         <p class="mb-2"><strong class="font-semibold text-gray-800">Email:</strong> {{ $order->customer->email ?? 'N/A' }}</p>
-        <p class="mb-2"><strong class="font-semibold text-gray-800">Số điện thoại:</strong> {{ $order->phone ?? 'N/A' }}</p>
-        <p class="mb-2"><strong class="font-semibold text-gray-800">Địa chỉ giao hàng:</strong> {{ $order->address ?? 'N/A' }}</p>
+        <p class="mb-2"><strong class="font-semibold text-gray-800">Số điện thoại:</strong> {{ $order->customer->phone ?? 'N/A' }}</p>
+        <p class="mb-2"><strong class="font-semibold text-gray-800">Địa chỉ giao hàng:</strong> {{ $order->customer->address ?? 'N/A' }}</p>
         <p class="mb-4"><strong class="font-semibold text-gray-800">Ngày đặt:</strong> {{ $order->formatted_created_at }}</p>
         <h4 class="text-xl font-semibold text-gray-800 mb-4">Sản phẩm</h4>
         <div class="overflow-x-auto mb-4">
