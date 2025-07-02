@@ -11,7 +11,7 @@
         @if($product->image)
         <div class="mb-4">
             <label class="block text-gray-700 text-sm font-medium mb-2">Ảnh hiện tại:</label>
-            <img src="{{ secure_asset('images/products/' . $product->image) }}" alt="{{ $product->name }}" class="w-32 h-32 object-cover rounded-md border border-gray-300 shadow-sm">
+            <img src="{{ asset('images/products/' . $product->image) }}" alt="{{ $product->name }}" class="w-32 h-32 object-cover rounded-md border border-gray-300 shadow-sm">
         </div>
         @endif
         

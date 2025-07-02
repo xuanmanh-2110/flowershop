@@ -13,7 +13,7 @@
     <div class="bg-white rounded-xl shadow-lg overflow-hidden md:flex transition-all duration-300 ease-in-out transform hover:scale-[1.01] hover:shadow-xl">
         <div class="md:flex-shrink-0 md:w-1/2 p-6">
             @if($product->image)
-                <img src="{{ secure_asset('images/products/' . $product->image) }}" alt="{{ $product->name }}" class="w-[430px] h-[430px] object-cover rounded-lg shadow-md transition-transform duration-300 hover:scale-105">
+                <img src="{{ asset('images/products/' . $product->image) }}" alt="{{ $product->name }}" class="w-[430px] h-[430px] object-cover rounded-lg shadow-md transition-transform duration-300 hover:scale-105">
             @else
                 <img src="https://via.placeholder.com/430x430?text=No+Image" alt="No Image" class="w-[430px] h-[430px] object-cover rounded-lg shadow-md transition-transform duration-300 hover:scale-105">
             @endif
@@ -98,7 +98,7 @@
             @foreach($randomProducts as $p)
             <div class="bg-white rounded-lg shadow-sm p-3 text-center transition-all duration-300 ease-in-out relative overflow-hidden border border-gray-200 flex flex-col items-center h-full hover:translate-y-[-3px] hover:shadow-md">
                 <a href="{{ route('products.show', $p->id) }}" class="no-underline text-inherit">
-                    <img src="{{ $p->image ? secure_asset('images/products/' . $p->image) : 'https://via.placeholder.com/200x200' }}" alt="{{ $p->name }}" class="w-full aspect-square object-cover rounded-md mb-2 border border-gray-200 transition-transform duration-300 group-hover:scale-105">
+                    <img src="{{ $p->image ? asset('images/products/' . $p->image) : 'https://via.placeholder.com/200x200' }}" alt="{{ $p->name }}" class="w-full aspect-square object-cover rounded-md mb-2 border border-gray-200 transition-transform duration-300 group-hover:scale-105">
                     <div class="text-sm font-semibold mb-1 text-rose-600 min-h-[3rem] flex items-center justify-center leading-tight w-full">{{ $p->name }}</div>
                     <div class="text-rose-600 text-base font-bold mb-2">{{ number_format($p->price, 0, ',', '.') }} VND</div>
                 </a>
@@ -151,7 +151,7 @@
                     <div class="flex items-center space-x-3 p-3 bg-gray-50 rounded-md border">
                         <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200">
                             @if(Auth::user()->avatar)
-                                <img src="{{ secure_asset('images/avatars/' . Auth::user()->avatar) }}" alt="Avatar" class="w-full h-full object-cover">
+                                <img src="{{ asset('images/avatars/' . Auth::user()->avatar) }}" alt="Avatar" class="w-full h-full object-cover">
                             @else
                                 <div class="w-full h-full bg-rose-100 flex items-center justify-center">
                                     <span class="text-rose-600 font-semibold text-sm">{{ substr(Auth::user()->name, 0, 1) }}</span>
@@ -190,7 +190,7 @@
                         <div class="flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-200">
                                 @if($review->user && $review->user->avatar)
-                                    <img src="{{ secure_asset('images/avatars/' . $review->user->avatar) }}" alt="Avatar" class="w-full h-full object-cover">
+                                    <img src="{{ asset('images/avatars/' . $review->user->avatar) }}" alt="Avatar" class="w-full h-full object-cover">
                                 @else
                                     <div class="w-full h-full bg-rose-100 flex items-center justify-center">
                                         <span class="text-rose-600 font-semibold">{{ substr($review->reviewer_name, 0, 1) }}</span>
@@ -496,7 +496,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Avatar cho user hiện tại
         const currentUserAvatar = '{{ Auth::user()->avatar ?? "" }}';
         const avatarHtml = (isCurrentUser && currentUserAvatar)
-            ? `<img src="{{ secure_asset('images/avatars/') }}/${currentUserAvatar}" alt="Avatar" class="w-full h-full object-cover">`
+            ? `<img src="{{ asset('images/avatars/') }}/${currentUserAvatar}" alt="Avatar" class="w-full h-full object-cover">`
             : `<div class="w-full h-full bg-rose-100 flex items-center justify-center">
                  <span class="text-rose-600 font-semibold">${firstLetter}</span>
                </div>`;

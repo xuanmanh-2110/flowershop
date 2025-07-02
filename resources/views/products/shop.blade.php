@@ -42,7 +42,7 @@
         @forelse($products as $p)
         <div class="bg-white rounded-xl shadow-md p-4 text-center transition-all duration-300 ease-in-out relative overflow-hidden border border-gray-200 flex flex-col items-center h-full hover:translate-y-[-5px] hover:shadow-lg">
             <a href="{{ route('products.show', $p->id) }}" class="no-underline text-inherit">
-                <img src="{{ $p->image ? secure_asset('images/products/' . $p->image) : 'https://via.placeholder.com/200x200' }}" alt="{{ $p->name }}" class="w-[200px] h-[200px] object-cover rounded-md mb-3 border border-gray-200 transition-transform duration-300 group-hover:scale-105">
+                <img src="{{ $p->image ? asset('images/products/' . $p->image) : 'https://via.placeholder.com/200x200' }}" alt="{{ $p->name }}" class="w-[200px] h-[200px] object-cover rounded-md mb-3 border border-gray-200 transition-transform duration-300 group-hover:scale-105">
                 <div class="text-base font-semibold mb-2 text-rose-600 min-h-[4.5rem] flex items-center justify-center leading-tight w-full">{{ $p->name }}</div>
                 <div class="mb-3">
                     @if(in_array($p->id, $latestProductIds))
