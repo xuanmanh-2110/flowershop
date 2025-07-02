@@ -35,7 +35,7 @@
                 <tr class="hover:bg-gray-100">
                     <td class="px-6 py-4 whitespace-nowrap">
                         @if($p->image)
-                            <img src="{{ asset('images/products/' . $p->image) }}" class="w-24 h-24 object-cover rounded-md" alt="{{ $p->name }}">
+                            <img src="{{ secure_asset('images/products/' . $p->image) }}" class="w-24 h-24 object-cover rounded-md" alt="{{ $p->name }}">
                         @else
                             <span class="text-gray-500">Không có ảnh</span>
                         @endif

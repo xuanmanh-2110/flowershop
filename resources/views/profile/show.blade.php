@@ -18,7 +18,7 @@
                 <div class="flex flex-col items-center">
                     <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-200 shadow-lg">
                         @if(Auth::user()->avatar)
-                            <img src="{{ asset('images/avatars/' . Auth::user()->avatar) }}" alt="Avatar" class="w-full h-full object-cover">
+                            <img src="{{ secure_asset('images/avatars/' . Auth::user()->avatar) }}" alt="Avatar" class="w-full h-full object-cover">
                         @else
                             <div class="w-full h-full bg-gray-200 flex items-center justify-center">
                                 <span class="text-4xl text-gray-500">{{ substr(Auth::user()->name, 0, 1) }}</span>

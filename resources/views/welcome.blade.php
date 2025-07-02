@@ -49,7 +49,7 @@
     <div class="absolute inset-0 z-0">
       @if(isset($products[0]) && $products[0]->image)
         <img
-          src="{{ asset('images/products/' . $products[0]->image) }}"
+          src="{{ secure_asset('images/products/' . $products[0]->image) }}"
           alt="Background"
           class="w-full h-full object-cover blur-sm scale-105">
       @else
@@ -72,7 +72,7 @@
       @for($i = 0; $i < 5; $i++)
         @php
           $img = isset($products[$i]) && $products[$i]->image
-            ? asset('images/products/' . $products[$i]->image)
+            ? secure_asset('images/products/' . $products[$i]->image)
             : 'https://via.placeholder.com/400x400?text=Hoa+tươi';
           $alt = isset($products[$i]) ? $products[$i]->name : 'Hoa tươi';
         @endphp
@@ -141,7 +141,7 @@
           <div class="bg-white rounded-xl shadow-md py-6 px-2 text-center transition-all duration-300 ease-in-out relative overflow-hidden border border-gray-200 flex flex-col h-full hover:translate-y-[-5px] hover:shadow-lg">
             <div class="flex justify-center items-center mb-6 overflow-hidden rounded-md mx-2">
               @if($p->image)
-                <img src="{{ asset('images/products/' . $p->image) }}" alt="{{ $p->name }}" class="w-full h-[240px] object-cover transition-transform duration-300 group-hover:scale-105">
+                <img src="{{ secure_asset('images/products/' . $p->image) }}" alt="{{ $p->name }}" class="w-full h-[240px] object-cover transition-transform duration-300 group-hover:scale-105">
               @else
                 <img src="https://via.placeholder.com/240x240" alt="No Image" class="w-full h-[240px] object-cover transition-transform duration-300 group-hover:scale-105">
               @endif
@@ -178,7 +178,7 @@
                  style="width: 260px; display: flex; align-items: center; justify-content: center;">
               <div class="bg-white rounded-xl shadow-md border border-gray-200 p-6 text-center transition-all duration-1000 ease-in-out">
                 <a href="{{ route('products.show', $product->id) }}" class="block no-underline text-inherit hover:opacity-80 transition-opacity duration-200">
-                  <img src="{{ $product->image ? asset('images/products/' . $product->image) : 'https://via.placeholder.com/200x200' }}"
+                  <img src="{{ $product->image ? secure_asset('images/products/' . $product->image) : 'https://via.placeholder.com/200x200' }}"
                        alt="{{ $product->name }}"
                        class="w-[200px] h-[200px] object-cover rounded-md border border-gray-300 mb-3 mx-auto transition-transform duration-1000 ease-in-out">
                   

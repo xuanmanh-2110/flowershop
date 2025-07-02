@@ -122,7 +122,7 @@
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-200">
                             @if($review->user && $review->user->avatar)
-                                <img src="{{ asset('images/avatars/' . $review->user->avatar) }}" alt="Avatar" class="w-full h-full object-cover">
+                                <img src="{{ secure_asset('images/avatars/' . $review->user->avatar) }}" alt="Avatar" class="w-full h-full object-cover">
                             @else
                                 <div class="w-full h-full bg-rose-100 flex items-center justify-center">
                                     <span class="text-rose-600 font-semibold">{{ substr($review->reviewer_name, 0, 1) }}</span>
