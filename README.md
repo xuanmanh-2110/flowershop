@@ -1095,11 +1095,10 @@ sequenceDiagram
     View-->>Admin: Hiển thị phân bố đánh giá
 ```
 
-## Liên kết
+## 🌐 Liên kết
 
-**GitHub:**https://github.com/xuanmanh-2110
-
-**GitHub Repo:**https://github.com/xuanmanh-2110/flowershop
+- [💻 GitHub cá nhân](https://github.com/xuanmanh-2110)
+- [📦 Repository FlowerShop](https://github.com/xuanmanh-2110/flowershop)
 
 **Dirve demo:**https://drive.google.com/file/d/1IfGduuV_am46T60VDzUxXA4A0UIZUxRO/view?usp=sharing
 ---
