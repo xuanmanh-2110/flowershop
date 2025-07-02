@@ -10,4 +10,19 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
+    base: '/build/',
+    build: {
+        manifest: true,
+        outDir: 'public/build',
+        rollupOptions: {
+            output: {
+                entryFileNames: 'assets/[name]-[hash].js',
+                chunkFileNames: 'assets/[name]-[hash].js',
+                assetFileNames: 'assets/[name]-[hash][extname]',
+            },
+        },
+    },
+    server: {
+        https: true,
+    },
 });
