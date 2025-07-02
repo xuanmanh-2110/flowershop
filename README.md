@@ -1099,6 +1099,5 @@ sequenceDiagram
 
 - [💻 GitHub cá nhân](https://github.com/xuanmanh-2110)
 - [📦 Repository FlowerShop](https://github.com/xuanmanh-2110/flowershop)
-
-**Dirve demo:**https://drive.google.com/file/d/1IfGduuV_am46T60VDzUxXA4A0UIZUxRO/view?usp=sharing
+- [▶️ Demo Google Drive](https://drive.google.com/file/d/1IfGduuV_am46T60VDzUxXA4A0UIZUxRO/view?usp=sharing)
 ---
