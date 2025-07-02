@@ -50,7 +50,7 @@ class CheckoutController extends Controller
             $userPhone = $user->phone;
         }
         
-        // Fallback: Lấy thông tin giao hàng từ đơn hàng gần nhất nếu user chưa có thông tin
+         // Trường hợp dự phòng: Lấy thông tin giao hàng từ đơn hàng gần nhất nếu user chưa có thông tin
         $customer = \App\Models\Customer::where('email', $user->email)->first();
         $lastOrder = null;
         if ($customer && (!$userAddress || !$userPhone)) {
@@ -123,8 +123,8 @@ class CheckoutController extends Controller
 
         $order = Order::create($orderData);
         
-        // Debug log
-        \Log::info('Order created with phone: ' . $request->phone);
+         // Ghi log phục vụ debug
+                \Log::info('Order created with phone: ' . $request->phone);
 
         $total = 0;
         foreach ($cart as $id => $item) {

@@ -65,7 +65,7 @@ public function store(Request $request)
 
     $order = Order::create([
         'customer_id' => $request->customer_id,
-        'total_amount' => 0, // sẽ tính sau
+        'total_amount' => 0, // sẽ được tính sau
     ]);
 
     $total = 0;
@@ -104,7 +104,7 @@ public function show($id)
     $order = Order::with('customer', 'items.product')->findOrFail($id);
     return view('orders.show', compact('order'));
 }
-// Lịch sử mua hàng cho khách hàng
+ // Hiển thị lịch sử mua hàng cho khách hàng
 public function history(Request $request)
 {
     $user = \Auth::user();
@@ -131,12 +131,12 @@ public function history(Request $request)
     $filters = $request->only(['status', 'from', 'to']);
     return view('orders.history', compact('orders', 'filters'));
 }
-// Hủy đơn hàng cho khách hàng
+ // Xử lý hủy đơn hàng cho khách hàng
     public function cancel($id)
     {
         $order = \App\Models\Order::findOrFail($id);
-        // Giả sử trạng thái lưu ở trường 'status', các trạng thái: 'pending', 'processing', 'shipped', 'cancelled'
-        if (in_array($order->status ?? 'pending', ['pending', 'processing'])) {
+         // Giả sử trạng thái lưu ở trường 'status', các trạng thái có thể là: 'pending', 'processing', 'shipped', 'cancelled'
+                if (in_array($order->status ?? 'pending', ['pending', 'processing'])) {
             $order->status = 'cancelled';
             $order->save();
             return redirect()->route('orders.show', $order->id)->with('success', 'Đơn hàng đã được hủy thành công.');
