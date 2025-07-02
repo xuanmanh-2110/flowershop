@@ -1,6 +1,6 @@
 <nav class="bg-white flex justify-between items-center px-5 py-4 border-b border-gray-200 mb-4 w-full rounded-xl">
     <div class="container mx-auto flex justify-between items-center">
-        <a class="text-gray-800 text-lg font-semibold" href="{{ url('/') }}">FlowerShop</a>
+        <a class="text-gray-800 text-lg font-semibold" href="http://127.0.0.1:8000">FlowerShop</a>
         <button class="block lg:hidden" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="h-6 w-6 text-gray-500"></span>
         </button>
