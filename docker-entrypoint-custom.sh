@@ -6,5 +6,5 @@ php artisan route:cache
 php artisan view:cache
 php artisan migrate --force
 
-# Khởi động dịch vụ gốc của container (Nginx + PHP-FPM)
-exec /opt/docker/bin/entrypoint supervisord
+# Khởi động dịch vụ mặc định của container (giữ nguyên PID 1)
+exec supervisord
