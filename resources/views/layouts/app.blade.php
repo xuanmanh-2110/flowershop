@@ -85,13 +85,13 @@
             var btnHero = document.getElementById('order-now-btn');
             if (btnHero) {
                 btnHero.addEventListener('click', function() {
-                    window.location.href = 'http://127.0.0.1:8000/shop';
+                    window.location.href = "{{ url('/shop') }}";
                 });
             }
             var btnPromo = document.getElementById('order-now-btn-promo');
             if (btnPromo) {
                 btnPromo.addEventListener('click', function() {
-                    window.location.href = 'http://127.0.0.1:8000/shop';
+                    window.location.href = "{{ url('/shop') }}";
                 });
             }
 

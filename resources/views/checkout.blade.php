@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<a href="http://127.0.0.1:8000/shop" class="inline-block bg-rose-100 hover:bg-rose-200 text-rose-600 font-bold py-2 px-4 rounded-md shadow-md transition-colors duration-200 mb-4 ml-4">← Quay lại cửa hàng</a>
+<a href="{{ url('/shop') }}" class="inline-block bg-rose-100 hover:bg-rose-200 text-rose-600 font-bold py-2 px-4 rounded-md shadow-md transition-colors duration-200 mb-4 ml-4">← Quay lại cửa hàng</a>
 <div class="max-w-3xl mx-auto my-10 p-6 bg-white rounded-lg">
     <h2 class="text-3xl font-bold text-rose-600 mb-6 text-center">Thanh toán đơn hàng</h2>
     <form action="{{ route('checkout.process') }}" method="POST" class="bg-white p-6 rounded-lg shadow-md">
