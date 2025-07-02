@@ -11,7 +11,14 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        //
+        $middleware->trustProxies(at: [
+            '*'
+        ]);
+        
+        // Add middleware to fix asset URLs in production
+        $middleware->web(append: [
+            \App\Http\Middleware\FixAssetUrls::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
