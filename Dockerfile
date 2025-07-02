@@ -1,53 +1,36 @@
-# syntax=docker/dockerfile:1
+FROM webdevops/php-nginx:8.3-alpine
 
-FROM composer:2.7 AS vendor
-
+# Set working directory
 WORKDIR /app
 
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --prefer-dist
+# Install additional dependencies as root
+USER root
+RUN apk add --no-cache postgresql-client libpq nodejs npm \
+    && mkdir -p /app/storage/framework/cache /app/storage/framework/sessions /app/storage/framework/views /app/bootstrap/cache \
+    && chown -R application:application /app \
+    && chmod -R 775 /app/storage /app/bootstrap/cache
 
-FROM node:18 AS node_modules
+# Copy application code
+COPY --chown=application:application . .
 
-WORKDIR /app
+# Install Node.js dependencies and build frontend assets
+RUN npm install && npm run build
 
-COPY package.json package-lock.json ./
-RUN npm install
+# Install Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-FROM php:8.2-fpm
+# Install Composer dependencies
+RUN composer install --no-dev --optimize-autoloader
 
-WORKDIR /var/www
+# Set environment variables for Laravel
+ENV WEB_DOCUMENT_ROOT=/app/public
+ENV APP_ENV=production
+ENV APP_DEBUG=false
+ENV NGINX_WEB_ROOT=/app/public
 
-# Cài các extension cần thiết cho Laravel
-RUN apt-get update && apt-get install -y \
-    libpng-dev \
-    libonig-dev \
-    libxml2-dev \
-    zip \
-    unzip \
-    git \
-    curl \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+# Copy custom entrypoint script and make it executable
+COPY --chown=application:application docker-entrypoint-custom.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint-custom.sh
 
-# Cài Composer
-COPY --from=vendor /usr/bin/composer /usr/bin/composer
-
-# Copy source code
-COPY . .
-
-# Copy vendor và node_modules
-COPY --from=vendor /app/vendor /var/www/vendor
-COPY --from=node_modules /app/node_modules /var/www/node_modules
-
-# Build frontend
-RUN npm run build
-
-# Tạo key ứng dụng nếu chưa có
-RUN php artisan key:generate --force || true
-
-# Phân quyền
-RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
-
-EXPOSE 8000
-
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+# Set custom entrypoint
+CMD ["docker-entrypoint-custom.sh"]
