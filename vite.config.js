@@ -10,15 +10,4 @@ export default defineConfig({
         }),
         tailwindcss(),
     ],
-    server: {
-        https: process.env.APP_ENV === 'production'
-    },
-    build: {
-        manifest: true,
-        rollupOptions: {
-            output: {
-                manualChunks: undefined,
-            }
-        }
-    }
 });
