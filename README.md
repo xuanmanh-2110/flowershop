@@ -1094,4 +1094,10 @@ sequenceDiagram
     ProductController-->>View: Trả về dữ liệu
     View-->>Admin: Hiển thị phân bố đánh giá
 ```
+
+## Liên kết
+**GitHub:**https://github.com/xuanmanh-2110
+**GitHub Repo:**https://github.com/xuanmanh-2110/flowershop
+**Dirve demo:**https://drive.google.com/drive/folders/1wrPHKedhxQVviYBXhMhc1YYWm2nAFKon
+
 ---
